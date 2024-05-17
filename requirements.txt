@@ -1,0 +1,6 @@
+pettingzoo[classic,atari,mpe]
+agilerl
+imageio
+langchain
+openai
+tenacity
