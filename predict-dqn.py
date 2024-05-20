@@ -223,6 +223,7 @@ def resize_frames(frames, fraction):
 
 
 if __name__ == "__main__":
+    # device = torch.device('mps') # if on mac
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     path = "./models/DQN/lesson3_trained_agent.pt"  # Path to saved agent checkpoint

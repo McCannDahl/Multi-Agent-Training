@@ -483,6 +483,7 @@ class Opponent:
 
 
 if __name__ == "__main__":
+    # device = torch.device('mps') # if on mac
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("===== AgileRL Curriculum Learning Demo =====")
 
@@ -522,7 +523,7 @@ if __name__ == "__main__":
             "NUM_ATOMS": 51,  # Unit number of support
             "V_MIN": 0.0,  # Minimum value of support
             "V_MAX": 200.0,  # Maximum value of support
-            "WANDB": False,  # Use Weights and Biases tracking
+            "WANDB": True,  # Use Weights and Biases tracking
         }
 
         # Define the connect four environment
@@ -609,8 +610,8 @@ if __name__ == "__main__":
 
         # ! NOTE: Uncomment the max_episodes line below to change the number of training episodes. ! #
         # It is deliberately set low to allow testing to ensure this tutorial is sound.
-        max_episodes = 10
-        # max_episodes = LESSON["max_train_episodes"]  # Total episodes
+        # max_episodes = 10
+        max_episodes = LESSON["max_train_episodes"]  # Total episodes
 
         max_steps = 500  # Maximum steps to take in each episode
         evo_epochs = 20  # Evolution frequency
@@ -621,6 +622,9 @@ if __name__ == "__main__":
         eps_decay = 0.9998  # Epsilon decays
         opp_update_counter = 0
         wb = INIT_HP["WANDB"]
+
+        if wb:
+            wandb.login()
 
         if LESSON["pretrained_path"] is not None:
             for agent in pop:
@@ -923,6 +927,7 @@ if __name__ == "__main__":
 
             mean_turns = np.mean(turns_per_episode)
 
+            print(f'Now evolve population if necessary {idx_epi} {(idx_epi + 1) % evo_epochs}')
             # Now evolve population if necessary
             if (idx_epi + 1) % evo_epochs == 0:
                 # Evaluate population vs random actions
@@ -1027,6 +1032,7 @@ if __name__ == "__main__":
                     for index, action in enumerate(eval_actions_hist)
                 }
 
+                print('ABOUT TO UPDATE WANDB')
                 if wb:
                     wandb_dict = {
                         "global_step": total_steps,
@@ -1041,6 +1047,7 @@ if __name__ == "__main__":
                     wandb_dict.update(train_actions_dict)
                     wandb_dict.update(eval_actions_dict)
                     wandb.log(wandb_dict)
+                    print(wandb_dict)
 
                 # Tournament selection and population mutation
                 elite, pop = tournament.select(pop)
